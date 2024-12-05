@@ -32,10 +32,6 @@ module ActionView
           end
         end
 
-        if host = compute_asset_host(source, options)
-          source = File.join(host, source)
-        end
-
         "#{source}#{tail}"
       end
       alias_method :path_to_remix_asset, :remix_asset_path
