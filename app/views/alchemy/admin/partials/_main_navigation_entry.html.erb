@@ -8,7 +8,7 @@
       <% elsif navigation["icon"] %>
         <%# Cannot use the render_icon helper, because the navigation["icon"] includes the style %>
         <svg class="icon">
-          <use href="alchemy-icons/remixicon.symbol.svg#ri-<%= navigation["icon"] %>" />
+          <use href="<%= remix_asset_path("remixicon.symbol.svg") %>#ri-<%= navigation["icon"] %>" />
         </svg>
       <% else %>
         <%= render_icon :table %>
