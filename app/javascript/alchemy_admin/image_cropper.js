@@ -1,91 +1,99 @@
-export default class ImageCropper {
-  constructor(
-    minSize,
-    defaultBox,
-    aspectRatio,
-    trueSize,
-    formFieldIds,
-    elementId
-  ) {
-    this.initialized = false
+import Cropper from "cropperjs"
 
-    this.minSize = minSize
+export default class ImageCropper {
+  #initialized = false
+  #cropper = null
+  #cropFromField = null
+  #cropSizeField = null
+
+  constructor(image, defaultBox, aspectRatio, formFieldIds, elementId) {
+    this.image = image
     this.defaultBox = defaultBox
     this.aspectRatio = aspectRatio
-    this.trueSize = trueSize
-    this.cropFromField = document.getElementById(formFieldIds[0])
-    this.cropSizeField = document.getElementById(formFieldIds[1])
+    this.#cropFromField = document.getElementById(formFieldIds[0])
+    this.#cropSizeField = document.getElementById(formFieldIds[1])
     this.elementId = elementId
     this.dialog = Alchemy.currentDialog()
-    this.dialog.options.closed = this.destroy
-
+    if (this.dialog) {
+      this.dialog.options.closed = () => this.destroy()
+      this.bind()
+    }
     this.init()
-    this.bind()
   }
 
-  get jcropOptions() {
+  get cropperOptions() {
     return {
-      onSelect: this.update.bind(this),
-      setSelect: this.box,
       aspectRatio: this.aspectRatio,
-      minSize: this.minSize,
-      boxWidth: 800,
-      boxHeight: 600,
-      trueSize: this.trueSize,
-      closed: this.destroy.bind(this)
+      viewMode: 1,
+      zoomable: false,
+      checkCrossOrigin: false, // Prevent CORS issues
+      checkOrientation: false, // Prevent loading the image via AJAX which can cause CORS issues
+      data: this.box,
+      cropend: () => {
+        const data = this.#cropper.getData(true)
+        this.update(data)
+      }
     }
   }
 
   get cropFrom() {
-    if (this.cropFromField.value) {
-      return this.cropFromField.value.split("x").map((v) => parseInt(v))
+    if (this.#cropFromField?.value) {
+      return this.#cropFromField.value.split("x").map((v) => parseInt(v))
     }
   }
 
   get cropSize() {
-    if (this.cropSizeField.value) {
-      return this.cropSizeField.value.split("x").map((v) => parseInt(v))
+    if (this.#cropSizeField?.value) {
+      return this.#cropSizeField.value.split("x").map((v) => parseInt(v))
     }
   }
 
   get box() {
     if (this.cropFrom && this.cropSize) {
-      return [
-        this.cropFrom[0],
-        this.cropFrom[1],
-        this.cropFrom[0] + this.cropSize[0],
-        this.cropFrom[1] + this.cropSize[1]
-      ]
+      return {
+        x: this.cropFrom[0],
+        y: this.cropFrom[1],
+        width: this.cropSize[0],
+        height: this.cropSize[1]
+      }
     } else {
-      return this.defaultBox
+      return this.defaultBoxSize
+    }
+  }
+
+  get defaultBoxSize() {
+    return {
+      x: this.defaultBox[0],
+      y: this.defaultBox[1],
+      width: this.defaultBox[2],
+      height: this.defaultBox[3]
     }
   }
 
   init() {
-    if (!this.initialized) {
-      this.api = $.Jcrop("#imageToCrop", this.jcropOptions)
-      this.initialized = true
+    if (!this.#initialized) {
+      this.#cropper = new Cropper(this.image, this.cropperOptions)
+      this.#initialized = true
     }
   }
 
   update(coords) {
-    this.cropFromField.value = Math.round(coords.x) + "x" + Math.round(coords.y)
-    this.cropFromField.dispatchEvent(new Event("change"))
-    this.cropSizeField.value = Math.round(coords.w) + "x" + Math.round(coords.h)
-    this.cropFromField.dispatchEvent(new Event("change"))
+    this.#cropFromField.value = `${coords.x}x${coords.y}`
+    this.#cropFromField.dispatchEvent(new Event("change"))
+    this.#cropSizeField.value = `${coords.width}x${coords.height}`
+    this.#cropSizeField.dispatchEvent(new Event("change"))
   }
 
   reset() {
-    this.api.setSelect(this.defaultBox)
-    this.cropFromField.value = `${this.box[0]}x${this.box[1]}`
-    this.cropSizeField.value = `${this.box[2]}x${this.box[3] - this.box[1]}`
+    this.#cropper.setData(this.defaultBoxSize)
+    this.update(this.defaultBoxSize)
   }
 
   destroy() {
-    if (this.api) {
-      this.api.destroy()
+    if (this.#cropper) {
+      this.#cropper.destroy()
     }
-    this.initialized = false
+    this.#initialized = false
     return true
   }
 

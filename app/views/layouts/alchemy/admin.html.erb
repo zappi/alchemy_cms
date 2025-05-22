@@ -1,10 +1,11 @@
 <!DOCTYPE html>
-<html lang="<%= ::I18n.locale %>" class="no-js">
+<html lang="<%= ::I18n.locale %>" class="no-js loading-custom-elements">
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title><%= render_alchemy_title %></title>
     <link rel="shortcut icon" href="<%= asset_path('alchemy/favicon.ico') %>">
+    <link rel="preload" href="<%= asset_path("remixicon.symbol.svg") %>" as="image" type="<%= Mime::Type.lookup_by_extension(:svg) %>" crossorigin>
     <%= csrf_meta_tag %>
     <meta name="robots" content="noindex">
     <meta name="alchemy-icon-sprite" content="<%= remix_asset_path("/alchemy-icons/remixicon.symbol.svg") %>">
@@ -13,7 +14,9 @@
     <%= stylesheet_link_tag('alchemy/custom-properties', media: 'screen', 'data-turbo-track' => true) %>
     <%= stylesheet_link_tag('alchemy/admin', media: 'screen', 'data-turbo-track' => true) %>
     <%= stylesheet_link_tag('alchemy/admin/print', media: 'print', 'data-turbo-track' => true) %>
-    <%= stylesheet_link_tag('alchemy/admin/custom', 'data-turbo-track' => true) %>
+    <% Alchemy.admin_stylesheets.each do |stylesheet| %>
+      <%= stylesheet_link_tag(stylesheet, 'data-turbo-track' => true) %>
+    <% end %>
     <%= yield :stylesheets %>
     <script>
       // Global Alchemy JavaScript object.
@@ -32,7 +35,9 @@
     <% end %>
     <%= yield :javascript_includes %>
   </head>
-  <%= content_tag :body, id: 'alchemy', class: alchemy_body_class + ["alchemy-light"] do %>
+  <%= content_tag :body, id: 'alchemy',
+    class: alchemy_body_class + ["alchemy-light"],
+    style: cookies["alchemy-elements-window-width"] && "--elements-window-width: #{cookies["alchemy-elements-window-width"]}px" do %>
     <noscript>
       <h1><%= Alchemy.t(:javascript_disabled_headline) %></h1>
       <p><%= Alchemy.t(:javascript_disabled_text) %></p>
@@ -89,7 +94,7 @@
     <div id="main_content">
       <%= yield %>
     </div>
-    <script>
+    <script type="module">
       // Setting the correct locale for select2 dropdown replacement.
       $.extend($.fn.select2.defaults, $.fn.select2.locales['<%= ::I18n.locale %>']);
     </script>

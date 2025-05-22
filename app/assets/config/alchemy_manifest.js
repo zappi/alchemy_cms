@@ -1,11 +1,7 @@
 //= link alchemy/admin/all.js
-//= link alchemy/preview.js
-//= link tinymce/plugins/alchemy_link/plugin.min.js
-//= link tinymce/icons/remixicons/icons.js
 //= link_tree ../builds/alchemy/
 //= link_tree ../builds/tinymce/
 //= link_tree ../images/alchemy/
-//= link_tree ../../../vendor/assets/fonts/
 //= link_tree ../../../vendor/assets/images/
 //= link_tree ../../javascript .js
 //= link_tree ../../../vendor/javascript .js

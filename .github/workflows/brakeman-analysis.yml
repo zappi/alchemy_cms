@@ -7,19 +7,23 @@ concurrency:
   group: brakeman-${{ github.ref_name }}
   cancel-in-progress: ${{ github.ref_name != 'main' }}
 
+permissions:
+  contents: read
+  security-events: write
+
 on:
   push:
-    branches: [main]
+    branches:
+      - 7.4-stable
   pull_request:
     # The branches below must be a subset of the branches above
-    branches: [main]
-  schedule:
-    - cron: "40 4 * * 2"
+    branches:
+      - 7.4-stable
 
 jobs:
   brakeman-scan:
     name: Brakeman Scan
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       # Checkout the repository to the GitHub Actions runner
       - name: Checkout

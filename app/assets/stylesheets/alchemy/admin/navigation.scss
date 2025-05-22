@@ -131,7 +131,7 @@
 
   img,
   svg,
-  .icon {
+  alchemy-icon {
     display: inline-flex;
     width: var(--icon-size-xxl);
     height: var(--icon-size-xxl);
@@ -193,6 +193,14 @@
   }
 }
 
+:root {
+  --main-menu-width: #{$main-menu-width};
+}
+
+.collapsed-menu {
+  --main-menu-width: #{$collapsed-main-menu-width};
+}
+
 @media screen and (min-width: $large-screen-break-point) {
   body:not(.collapsed-menu) {
     .sub_navigation {
@@ -222,7 +230,7 @@
   display: flex;
   flex-grow: 1;
   flex-wrap: nowrap;
-  height: $header-height;
+  height: $header-height + 1px;
 
   label {
     float: left;

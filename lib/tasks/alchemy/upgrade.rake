@@ -7,8 +7,8 @@ namespace :alchemy do
   desc "Upgrades your app to AlchemyCMS v#{Alchemy::VERSION}."
   task upgrade: [
     "alchemy:upgrade:prepare",
-    "alchemy:upgrade:7.0:run",
-    "alchemy:upgrade:7.3:run"
+    "alchemy:upgrade:7.3:run",
+    "alchemy:upgrade:7.4:run"
   ] do
     Alchemy::Upgrader.display_todos
   end
@@ -31,14 +31,6 @@ namespace :alchemy do
       Alchemy::Upgrader.copy_new_config_file
     end
 
-    desc "Upgrade Alchemy to v7.0"
-    task "7.0" => [
-      "alchemy:upgrade:prepare",
-      "alchemy:upgrade:7.0:run"
-    ] do
-      Alchemy::Upgrader.display_todos
-    end
-
     desc "Upgrade Alchemy to v7.3"
     task "7.3" => [
       "alchemy:upgrade:prepare",
@@ -47,16 +39,12 @@ namespace :alchemy do
       Alchemy::Upgrader.display_todos
     end
 
-    namespace "7.0" do
-      task "run" => [
-        "alchemy:upgrade:7.0:remove_admin_entrypoint"
-      ]
-
-      desc "Remove alchemy admin entrypoint"
-      task remove_admin_entrypoint: [:environment] do
-        puts "removing npm_package..."
-        Alchemy::Upgrader::SevenPointZero.remove_admin_entrypoint
-      end
+    desc "Upgrade Alchemy to v7.4"
+    task "7.4" => [
+      "alchemy:upgrade:prepare",
+      "alchemy:upgrade:7.4:run"
+    ] do
+      Alchemy::Upgrader.display_todos
     end
 
     namespace "7.3" do
@@ -75,6 +63,17 @@ namespace :alchemy do
       desc "Generate custom css entrypoint"
       task generate_custom_css_entrypoint: [:environment] do
         Alchemy::Upgrader::SevenPointThree.generate_custom_css_entrypoint
+      end
+    end
+
+    namespace "7.4" do
+      task "run" => [
+        "alchemy:upgrade:7.4:update_custom_css_config"
+      ]
+
+      desc "Update custom alchemy admin stylesheet config"
+      task update_custom_css_config: [:environment] do
+        Alchemy::Upgrader::SevenPointFour.update_custom_css_config
       end
     end
   end

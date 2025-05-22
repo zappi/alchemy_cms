@@ -1,8 +1,10 @@
 // Alchemy CMS Sprockets Manifest
 // ------------------------------
-//= require jquery3
-//= require_tree ../../../../vendor/assets/javascripts/jquery_plugins/
-//= require handlebars
-//= require alchemy/templates
-//= require alchemy/alchemy.dialog
-//= require alchemy/alchemy.image_overlay
+//
+// This manifest file is deprecated and will be removed in Alchemy 8.0.
+//
+
+console.warn(
+  "The 'alchemy/admin' Sprockets manifest is deprecated and will be removed in 8.0. " +
+    "Please remove 'require alchemy/admin' from your 'vendor/assets/javascripts/alchemy/admin/all.js' file."
+)

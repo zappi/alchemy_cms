@@ -4,18 +4,18 @@ source "https://rubygems.org"
 
 gemspec
 
-rails_version = ENV.fetch("RAILS_VERSION", "7.2")
+rails_version = ENV.fetch("RAILS_VERSION", "8.0")
 gem "rails", "~> #{rails_version}.0"
 
 if ENV["DB"].nil? || ENV["DB"] == "sqlite"
-  gem "sqlite3", "~> 1.7.0"
+  gem "sqlite3", (rails_version == "7.0") ? "~> 1.7" : "~> 2.0"
 end
 if ENV["DB"] == "mysql" || ENV["DB"] == "mariadb"
   gem "mysql2", "~> 0.5.1"
 end
 gem "pg", "~> 1.0" if ENV["DB"] == "postgresql"
 
-gem "alchemy_i18n", git: "https://github.com/AlchemyCMS/alchemy_i18n.git", branch: "main"
+gem "alchemy_i18n", git: "https://github.com/AlchemyCMS/alchemy_i18n.git", branch: "4.2-stable"
 
 group :development, :test do
   gem "execjs", "~> 2.9.1"
@@ -30,6 +30,13 @@ group :development, :test do
     # https://github.com/hotwired/turbo-rails/issues/512
     if rails_version == "7.1"
       gem "actioncable", "~> #{rails_version}.0"
+    end
+
+    # concurrent-ruby v1.3.5 has removed the dependency on logger,
+    # effecting Rails 6.1 up to including 7.0.
+    # https://github.com/rails/rails/pull/54264
+    if ("6.1".to_f.."7.0".to_f).cover?(rails_version.to_f)
+      gem "concurrent-ruby", "< 1.3.5"
     end
   else
     gem "launchy"
@@ -57,7 +64,7 @@ end
 
 gem "web-console", "~> 4.2", group: :development
 
-gem "rails_live_reload", "~> 0.3.5"
+gem "rails_live_reload", "~> 0.4.0"
 
 gem "dartsass-rails", "~> 0.5.0"
 

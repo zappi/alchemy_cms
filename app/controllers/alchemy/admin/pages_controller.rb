@@ -29,7 +29,7 @@ module Alchemy
         unless: -> { @page_root },
         only: [:index]
 
-      before_action :set_view, only: [:index]
+      before_action :set_view, only: [:index, :update]
 
       before_action :set_page_version, only: [:show, :edit]
 
@@ -131,6 +131,10 @@ module Alchemy
           @notice = Alchemy.t("Page saved", name: @page.name)
           @while_page_edit = request.referer.include?("edit")
 
+          if @view == "list"
+            flash[:notice] = @notice
+          end
+
           unless @while_page_edit
             @tree = serialized_page_tree
           end
@@ -189,11 +193,7 @@ module Alchemy
       end
 
       def unlock_redirect_path
-        if params[:redirect_to].to_s.match?(/\A\/admin\/(layout_)?pages/)
-          params[:redirect_to]
-        else
-          admin_pages_path
-        end
+        safe_redirect_path(fallback: admin_pages_path)
       end
 
       # Sets the page public and updates the published_at attribute that is used as cache_key
